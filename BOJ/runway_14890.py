@@ -4,9 +4,10 @@ input = sys.stdin.readline
 SIZE, LIMIT = map(int, input().strip().split(' '))
 FIELD = [list(map(int, input().strip().split(' '))) for _ in range(SIZE)]
 
-def chk_ascension_validity(arr):
+def chk_validity(arr):
 	mod_arr = [[val, False] for val in arr]
 
+	# once with left -> right; once with right -> left (end of the loop, mod_arr.reverse())
 	for _ in range(2):
 		lp = 0
 		rp = 1
@@ -16,16 +17,19 @@ def chk_ascension_validity(arr):
 				lp += 1
 				rp += 1
 			else:
+				# only takes in account for descension (ascension case is handled with reverse)
 				if mod_arr[lp][0] - mod_arr[rp][0] == -1:
 					lp += 1
 					rp += 1
 				elif mod_arr[lp][0] - mod_arr[rp][0] == 1:
+					# index out of bounds
 					if lp + LIMIT >= SIZE:
 						return False
 					else:
 						new_height = mod_arr[rp][0]
 
 						for idx in range(rp, lp + LIMIT + 1):
+							# height must be equal and should not be used previously
 							if new_height == mod_arr[idx][0] and not mod_arr[idx][1]:
 								mod_arr[idx][1] = True
 							else:
@@ -33,6 +37,7 @@ def chk_ascension_validity(arr):
 
 						lp = lp + LIMIT
 						rp = lp + 1
+				# if height diff more than 1
 				else:
 					return False
 
@@ -42,11 +47,11 @@ def chk_ascension_validity(arr):
 
 valid_ctr = 0
 for row in FIELD:
-	if chk_ascension_validity(row):
+	if chk_validity(row):
 		valid_ctr += 1
 
 for col in list(zip(*FIELD)):
-	if chk_ascension_validity(col):
+	if chk_validity(col):
 		valid_ctr += 1
 
 print(valid_ctr)

@@ -46,25 +46,24 @@
 
 # print(get_dna([4, 26]))
 
-def dfs(query):
-	row, col = query
-	print(row, col)
+# def dfs(query):
+# 	row, col = query
+# 	print(row, col)
 
-	if row == 1:
-		return 'Rr'
+# 	if row == 1:
+# 		return 'Rr'
 
-	col -= 1
-	curr_idx = col % 4
-	if curr_idx == 0:
-		return 'RR'
-	if curr_idx == 3:
-		return 'rr'
+# 	col -= 1
+# 	curr_idx = col % 4
+# 	if curr_idx == 0:
+# 		return 'RR'
+# 	if curr_idx == 3:
+# 		return 'rr'
 
-	col += 1
-	dfs([row - 1, col // 4])
+# 	col += 1
+# 	dfs([row - 1, col // 4])
 
-# print(dfs([4, 26]))
-print(dfs([3, 9]))
+# print(dfs([3, 9]))
 
 # from collections import deque
 
@@ -92,3 +91,38 @@ print(dfs([3, 9]))
 #         result.append(''.join(all_levels[row-1][col-1]))
     
 #     return result
+
+# from copy import deepcopy
+# from collections import deque
+
+# size = 3
+# temp = 'a b c'
+# temp = temp.split(' ')
+
+# curr_arr = [temp[0]] 
+# all_arr = []
+# leftover = deque(temp)
+
+# def dfs(leftover, curr_arr, all_arr, size):
+# 	print(curr_arr)
+# 	print(leftover)
+# 	if len(curr_arr) >= 3:
+# 		all_arr.append(curr_arr.copy())
+# 		return
+
+# 	deep_arr = deepcopy(curr_arr)
+# 	concat_elem = leftover.popleft()
+
+# 	curr_arr.append(concat_elem)
+# 	deep_arr.append(' ' + concat_elem)
+
+# 	dfs(leftover, curr_arr, all_arr, size)
+# 	dfs(leftover, deep_arr, all_arr, size)
+
+# dfs(leftover, curr_arr, all_arr, size)
+# print(all_arr)
+
+
+
+
+
