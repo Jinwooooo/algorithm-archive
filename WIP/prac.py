@@ -122,7 +122,140 @@
 # dfs(leftover, curr_arr, all_arr, size)
 # print(all_arr)
 
+# import sys
+# from collections import deque
+# input = sys.stdin.readline
 
+# def calculate_index(r, c):
+#     return r * W + c
+    
+# direction_x = [0, 1, 0, -1] # 상 우 하 좌 (시계방향)
+# direction_y = [-1, 0, 1, 0]
 
+# def is_movable(dr, dc):
+#     if (0 <= dr < H and 0 <= dc < W):
+#         return True
+#     return False
+
+# def solution():
+#     global answer, b_count, parent
+
+#     while queue:
+#         current_r, current_c, current_d = queue.pop()
+#         is_rule_b = False
+#         new_direction = 0
+
+#         if (clear_board[current_r][current_c]): # RULE_B
+#             b_count += 1
+#             is_rule_b = True
+#             new_direction = (current_d + rule_b[current_r][current_c]) % 4
+
+#             if (path_start_index == -1):
+#                 next_index_set.clear()
+#                 path_start_index = calculate_index(current_r, current_c)
+
+#         else: # RULE_A
+#             answer += (b_count + 1)
+#             b_count = 0
+#             clear_board[current_r][current_c] = True
+#             new_direction = (current_d + rule_a[current_r][current_c]) % 4
+#             path_start_index = -1
+
+#         dr = current_r + direction_y[new_direction]
+#         dc = current_c + direction_x[new_direction]
+
+#         if (is_movable(dr, dc)):
+#             if (is_rule_b):
+#                 current_index = calculate_index(current_r, current_c)
+#                 next_index = calculate_index(dr, dc)
+
+#                 if (current_index != path_start_index):
+#                     queue.append((dr, dc, new_direction))
+#                     continue
+                
+#                 if (next_index in next_index_set):
+#                     break
+                
+#                 next_index_set.add(next_index)
+                
+#             queue.append((dr, dc, new_direction))
+#         else:
+#             break
+
+# H, W = map(int, input().split())
+# R, C, D = map(int, input().split())
+
+# clear_board = [[False for _ in range(W)] for _ in range(H)]
+
+# path_start_index = -1
+# next_index_set = set()
+
+# rule_a = []
+# rule_b = []
+
+# for _ in range(H):
+#     rule_a.append(list(map(int, str(input().rstrip()))))
+
+# for _ in range(H):
+#     rule_b.append(list(map(int, str(input().rstrip()))))
+
+# queue = deque()
+# queue.append((R, C, D))
+# answer = 0
+# b_count = 0
+
+# solution()
+
+# print(answer)
+
+import sys
+input = sys.stdin.readline
+
+HEIGHT, WIDTH = map(int, input().strip().split(' '))
+INIT_ARIS_DATA = list(map(int, input().strip().split(' ')))
+ROOM_A = [list(map(int, input().strip())) for _ in range(HEIGHT)]
+ROOM_B = [list(map(int, input().strip())) for _ in range(HEIGHT)]
+CLEAN = [[False for _ in range(WIDTH)] for _ in range(HEIGHT)]
+
+def simulate_aris():
+    curr_move = 0
+    final_move = 0
+    cycle_tracker = set()
+    row, col, d = INIT_ARIS_DATA
+
+    drow = [-1,0,1,0]
+    dcol = [0,1,0,-1]
+    
+    while True:
+        if not CLEAN[row][col]:
+            nd = (d + ROOM_A[row][col]) % 4
+        else:
+            nd = (d + ROOM_B[row][col]) % 4
+
+        nrow = row + drow[nd]
+        ncol = col + dcol[nd]
+
+        if 0 <= nrow < HEIGHT and 0 <= ncol < WIDTH:
+            curr_move += 1
+
+            if not CLEAN[row][col]:
+                final_move = curr_move
+                CLEAN[row][col] = True
+                cycle_tracker.clear()
+            else:
+                if (nrow, ncol, nd) in cycle_tracker:
+                    break
+            
+            cycle_tracker.add((nrow,ncol,nd))
+            row, col, d = nrow, ncol, nd
+        else:
+            if not CLEAN[row][col]:
+                curr_move += 1
+                final_move = curr_move
+            break
+
+    return final_move
+
+print(simulate_aris())
 
 
