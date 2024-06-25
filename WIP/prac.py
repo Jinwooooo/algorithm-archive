@@ -92,36 +92,6 @@
     
 #     return result
 
-# from copy import deepcopy
-# from collections import deque
-
-# size = 3
-# temp = 'a b c'
-# temp = temp.split(' ')
-
-# curr_arr = [temp[0]] 
-# all_arr = []
-# leftover = deque(temp)
-
-# def dfs(leftover, curr_arr, all_arr, size):
-# 	print(curr_arr)
-# 	print(leftover)
-# 	if len(curr_arr) >= 3:
-# 		all_arr.append(curr_arr.copy())
-# 		return
-
-# 	deep_arr = deepcopy(curr_arr)
-# 	concat_elem = leftover.popleft()
-
-# 	curr_arr.append(concat_elem)
-# 	deep_arr.append(' ' + concat_elem)
-
-# 	dfs(leftover, curr_arr, all_arr, size)
-# 	dfs(leftover, deep_arr, all_arr, size)
-
-# dfs(leftover, curr_arr, all_arr, size)
-# print(all_arr)
-
 # import sys
 # from collections import deque
 # input = sys.stdin.readline
@@ -208,54 +178,153 @@
 
 # print(answer)
 
+# import sys
+# input = sys.stdin.readline
+
+# HEIGHT, WIDTH = map(int, input().strip().split(' '))
+# INIT_ARIS_DATA = list(map(int, input().strip().split(' ')))
+# ROOM_A = [list(map(int, input().strip())) for _ in range(HEIGHT)]
+# ROOM_B = [list(map(int, input().strip())) for _ in range(HEIGHT)]
+# CLEAN = [[False for _ in range(WIDTH)] for _ in range(HEIGHT)]
+
+# def simulate_aris():
+#     curr_move = 0
+#     final_move = 0
+#     cycle_tracker = set()
+#     row, col, d = INIT_ARIS_DATA
+
+#     drow = [-1,0,1,0]
+#     dcol = [0,1,0,-1]
+    
+#     while True:
+#         if not CLEAN[row][col]:
+#             nd = (d + ROOM_A[row][col]) % 4
+#         else:
+#             nd = (d + ROOM_B[row][col]) % 4
+
+#         nrow = row + drow[nd]
+#         ncol = col + dcol[nd]
+
+#         if 0 <= nrow < HEIGHT and 0 <= ncol < WIDTH:
+#             curr_move += 1
+
+#             if not CLEAN[row][col]:
+#                 final_move = curr_move
+#                 CLEAN[row][col] = True
+#                 cycle_tracker.clear()
+#             else:
+#                 if (nrow, ncol, nd) in cycle_tracker:
+#                     break
+            
+#             cycle_tracker.add((nrow,ncol,nd))
+#             row, col, d = nrow, ncol, nd
+#         else:
+#             if not CLEAN[row][col]:
+#                 curr_move += 1
+#                 final_move = curr_move
+#             break
+
+#     return final_move
+
+# print(simulate_aris())
+
+# HEIGHT = 3
+# WIDTH = 4
+# ROOM_B = [[3,3,3,0],
+#           [3,0,2,1],
+#           [3,3,3,2]]
+# CLEAN = [[True for _ in range(WIDTH)] for _ in range(HEIGHT)]
+
+# WARP = [-1 for _ in range(HEIGHT * WIDTH * 4)]
+# # COST = [0 for _ in range(HEIGHT * WIDTH * 4)]
+
+# def compute_idx(row, col, d):
+#     return (row * WIDTH + col) * 4 + d
+
+# def update_warp_cost(stack, curr_idx):
+#     update_cost = len(stack)
+
+#     while stack:
+#         update_idx = stack.pop()
+#         WARP[update_idx] = curr_idx
+#         # COST[update_idx] = update_cost
+#         # update_cost -= 1
+
+# def simulate_aris(coord):
+#     row, col, d = coord
+#     stack = []
+
+#     drow = [-1,0,1,0]
+#     dcol = [0,1,0,-1]
+
+#     for _ in range(5):
+#         if CLEAN[row][col]:
+#             curr_idx = compute_idx(row,col,d)
+
+#             if WARP[curr_idx] == -1:
+#                 stack.append(curr_idx)
+
+#                 nd = (d + ROOM_B[row][col]) % 4
+#                 nrow = row + drow[nd]
+#                 ncol = col + dcol[nd]
+#             else:
+#                 nd = ((WARP[curr_idx] % 4) + ROOM_B[row][col]) % 4
+#                 nrow = WARP[curr_idx] // (WIDTH * 4) + drow[nd]
+#                 ncol = ((WARP[curr_idx] // 4) % WIDTH) + dcol[nd]
+
+#         if 0 <= nrow < HEIGHT and 0 <= ncol < WIDTH:
+#             if not CLEAN[nrow][ncol]:
+#                 update_warp_cost(stack, curr_idx)
+
+#             row, col, d = nrow, ncol, nd
+#         else:
+#             break
+
+#     update_warp_cost(stack, curr_idx)
+
+
+# simulate_aris((2,1,1))
+# print(WARP)
+# print('*****')
+# simulate_aris((1,1,1))
+# print(WARP)
+
 import sys
+from math import inf
+
 input = sys.stdin.readline
 
-HEIGHT, WIDTH = map(int, input().strip().split(' '))
-INIT_ARIS_DATA = list(map(int, input().strip().split(' ')))
-ROOM_A = [list(map(int, input().strip())) for _ in range(HEIGHT)]
-ROOM_B = [list(map(int, input().strip())) for _ in range(HEIGHT)]
-CLEAN = [[False for _ in range(WIDTH)] for _ in range(HEIGHT)]
+def bellman_ford(arr_edges, no_nodes):
+    arr_dist = [inf for _ in range(no_nodes + 1)]
+    arr_dist[1] = 0
 
-def simulate_aris():
-    curr_move = 0
-    final_move = 0
-    cycle_tracker = set()
-    row, col, d = INIT_ARIS_DATA
-
-    drow = [-1,0,1,0]
-    dcol = [0,1,0,-1]
-    
-    while True:
-        if not CLEAN[row][col]:
-            nd = (d + ROOM_A[row][col]) % 4
-        else:
-            nd = (d + ROOM_B[row][col]) % 4
-
-        nrow = row + drow[nd]
-        ncol = col + dcol[nd]
-
-        if 0 <= nrow < HEIGHT and 0 <= ncol < WIDTH:
-            curr_move += 1
-
-            if not CLEAN[row][col]:
-                final_move = curr_move
-                CLEAN[row][col] = True
-                cycle_tracker.clear()
-            else:
-                if (nrow, ncol, nd) in cycle_tracker:
-                    break
-            
-            cycle_tracker.add((nrow,ncol,nd))
-            row, col, d = nrow, ncol, nd
-        else:
-            if not CLEAN[row][col]:
-                curr_move += 1
-                final_move = curr_move
+    for iteration in range(no_nodes):
+        updated = False
+        for dist, start, end in arr_edges:
+            if arr_dist[start] < inf and arr_dist[end] > arr_dist[start] + dist:
+                arr_dist[end] = arr_dist[start] + dist
+                updated = True
+                if iteration == no_nodes - 1:
+                    return 'YES'
+        if not updated:
             break
 
-    return final_move
+    return 'NO'
 
-print(simulate_aris())
+arr_result = []
+for _ in range(int(input().strip())):
+    no_nodes, no_roads, no_warps = map(int, input().strip().split(' '))
+    arr_edges = []
+    for _ in range(no_roads):
+        start, end, dist = map(int, input().strip().split(' '))
+        arr_edges.append((dist, start, end))
+        arr_edges.append((dist, end, start))
+    for _ in range(no_warps):
+        start, end, dist = map(int, input().strip().split(' '))
+        arr_edges.append((-dist, start, end))
 
+    arr_result.append(bellman_ford(arr_edges, no_nodes))
+
+for r in arr_result:
+    print(r)
 
