@@ -290,89 +290,58 @@
 # print(WARP)
 
 import sys
-from collections import deque
 input = sys.stdin.readline
+near = [(i, j) for i in range(-1, 2) for j in range(-1, 2) if i or j]
 
-HEIGHT, WIDTH = map(int, input().strip().split(' '))
-LAKE = [list(map(str, input().strip())) for _ in range(HEIGHT)]
-PARENT = [i for i in range(HEIGHT * WIDTH)]
-RANK = [0 for _ in range(HEIGHT * WIDTH)]
-SWAN_IDX = []
 
-DROW = [-1, 0, 1, 0]
-DCOL = [0, 1, 0, -1]
+def find(a):
+    if parents[a] == a:
+        return a
+    parents[a] = find(parents[a])
+    return parents[a]
 
-def coord_to_idx(row, col):
-    return row * WIDTH + col
 
-def idx_to_coord(idx):
-    return divmod(idx, WIDTH)
+def union(up, down):
+    u = find(up)
+    d = find(down)
+    if u == d:
+        return
 
-def find(idx):
-    if PARENT[idx] != idx:
-        PARENT[idx] = find(PARENT[idx])
-    return PARENT[idx]
+    parents[u] = d
+    rank[d] += rank[u]
+    rank[u] = 0
 
-def union(idx1, idx2):
-    r1 = find(idx1)
-    r2 = find(idx2)
-    if r1 != r2:
-        if RANK[r1] > RANK[r2]:
-            PARENT[r2] = r1
-        elif RANK[r1] < RANK[r2]:
-            PARENT[r1] = r2
-        else:
-            PARENT[r2] = r1
-            RANK[r1] += 1
 
-def init(melt):
-    swan_coord = []
-    for row in range(HEIGHT):
-        for col in range(WIDTH):
-            if LAKE[row][col] == 'L':
-                idx = coord_to_idx(row, col)
-                swan_coord.append(idx)
-                SWAN_IDX.append(idx)
-                melt.append(idx)
-                LAKE[row][col] = '.'
+r, c = map(int, input().split())
+board = [list(map(int, input().split())) for _ in range(r)]
+parents = list(range(r*c))
+rank = [1] * r*c
 
-    while melt:
-        idx = melt.popleft()
-        row, col = idx_to_coord(idx)
-        for d in range(4):
-            nrow, ncol = row + DROW[d], col + DCOL[d]
-            if 0 <= nrow < HEIGHT and 0 <= ncol < WIDTH:
-                nidx = coord_to_idx(nrow, ncol)
-                if LAKE[nrow][ncol] == '.':
-                    union(idx, nidx)
-                elif LAKE[nrow][ncol] == 'X':
-                    melt.append(nidx)
+for i in range(r):
+    for j in range(c):
 
-def simulate_tick(melt):
-    next_melt = deque()
-    while melt:
-        idx = melt.popleft()
-        row, col = idx_to_coord(idx)
-        LAKE[row][col] = '.'
-        for d in range(4):
-            nrow, ncol = row + DROW[d], col + DCOL[d]
-            if 0 <= nrow < HEIGHT and 0 <= ncol < WIDTH:
-                nidx = coord_to_idx(nrow, ncol)
-                if LAKE[nrow][ncol] == 'X':
-                    next_melt.append(nidx)
-                elif LAKE[nrow][ncol] == '.':
-                    union(idx, nidx)
-    return next_melt
+        mn, x, y = board[i][j], i, j
 
-melt = deque()
-day = 0
+        
+        for a, b in near:
+            ni, nj = i+a, j+b
+            if ni < 0 or ni >= r or nj < 0 or nj >= c:
+                continue
 
-init(melt)
+            if mn > board[ni][nj]:
+                mn, x, y = board[ni][nj], ni, nj
 
-while find(SWAN_IDX[0]) != find(SWAN_IDX[1]):
-    melt = simulate_tick(melt)
-    day += 1
+        if mn != board[i][j]:
+            union(i*c+j, x*c+y)
 
-print(day)
+print(parents)
+print(rank)
+
+for i in range(r):
+    print(' '.join(map(str, rank[i*c:(i+1)*c])))
+
+
+
+
 
 
