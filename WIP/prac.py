@@ -291,55 +291,56 @@
 
 import sys
 input = sys.stdin.readline
-near = [(i, j) for i in range(-1, 2) for j in range(-1, 2) if i or j]
+sys.setrecursionlimit(10**6)
 
+RESULT = []
 
-def find(a):
-    if parents[a] == a:
-        return a
-    parents[a] = find(parents[a])
-    return parents[a]
+def find(parent, dist, idx):
+    if parent[idx] != idx:
+        original_parent = parent[idx]
+        parent[idx] = find(parent, dist, parent[idx])
+        dist[idx] += dist[original_parent]  # Accumulate distance to the root
+    return parent[idx]
 
+def union(parent, dist, rank, idx1, idx2, weight):
+    root1 = find(parent, dist, idx1)
+    root2 = find(parent, dist, idx2)
 
-def union(up, down):
-    u = find(up)
-    d = find(down)
-    if u == d:
-        return
+    if root1 != root2:
+        if rank[root1] > rank[root2]:
+            parent[root2] = root1
+            dist[root2] = dist[idx1] - dist[idx2] + weight
+        elif rank[root1] < rank[root2]:
+            parent[root1] = root2
+            dist[root1] = dist[idx2] + weight - dist[idx1]
+        else:
+            parent[root2] = root1
+            dist[root2] = dist[idx1] - dist[idx2] + weight
+            rank[root1] += 1
 
-    parents[u] = d
-    rank[d] += rank[u]
-    rank[u] = 0
+while True:
+    no_samples, no_cmds = map(int, input().strip().split())
+    if no_samples == 0 and no_cmds == 0:
+        break
 
+    parent = list(range(no_samples + 1))
+    dist = [0] * (no_samples + 1)
+    rank = [0] * (no_samples + 1)
 
-r, c = map(int, input().split())
-board = [list(map(int, input().split())) for _ in range(r)]
-parents = list(range(r*c))
-rank = [1] * r*c
+    for _ in range(no_cmds):
+        cmd = input().strip().split()
+        idx1, idx2 = int(cmd[1]), int(cmd[2])
+        if cmd[0] == '!':
+            weight = int(cmd[3])
+            union(parent, dist, rank, idx1, idx2, weight)
+        else:
+            if find(parent, dist, idx1) != find(parent, dist, idx2):
+                RESULT.append('UNKNOWN')
+            else:
+                RESULT.append(dist[idx1] - dist[idx2])
 
-for i in range(r):
-    for j in range(c):
-
-        mn, x, y = board[i][j], i, j
-
-        
-        for a, b in near:
-            ni, nj = i+a, j+b
-            if ni < 0 or ni >= r or nj < 0 or nj >= c:
-                continue
-
-            if mn > board[ni][nj]:
-                mn, x, y = board[ni][nj], ni, nj
-
-        if mn != board[i][j]:
-            union(i*c+j, x*c+y)
-
-print(parents)
-print(rank)
-
-for i in range(r):
-    print(' '.join(map(str, rank[i*c:(i+1)*c])))
-
+for result in RESULT:
+    print(result)
 
 
 

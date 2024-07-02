@@ -1,20 +1,23 @@
 import sys
-from collections import defaultdict
 input = sys.stdin.readline
+sys.setrecursionlimit(10**6)
 
 RESULT = []
 
-def find(parent, idx):
+def find(parent, dist, idx):
 	if parent[idx] != idx:
-		parent[idx] = find(parent, parent[idx])
+		o_idx = parent[idx]
+		parent[idx] = find(parent, dist, parent[idx])
+		dist[idx] += dist[o_idx]
 	return parent[idx]
 
-def union(parent, idx1, idx2):
-	r1 = find(parent, idx1)
-	r2 = find(parent, idx2)
+def union(parent, dist, idx1, idx2, weight):
+	r1 = find(parent, dist, idx1)
+	r2 = find(parent, dist, idx2)
 
 	if r1 != r2:
-		parent[r2] = r1
+		parent[r1] = r2
+		dist[r1] = dist[idx2] + weight - dist[idx1]
 
 while True:
 	no_samples, no_cmds = map(int, input().strip().split(' '))
@@ -22,19 +25,20 @@ while True:
 		break
 
 	parent = [idx for idx in range(no_samples + 1)]
-	diff = [0 for _ in range(no_samples)]
+	dist = [0 for _ in range(no_samples + 1)]
 
 	for _ in range(no_cmds):
 		cmd = list(map(str, input().strip().split(' ')))
-		e1, e2 = int(cmd[1]), int(cmd[2])
+		idx1, idx2 = int(cmd[1]), int(cmd[2])
 		if cmd[0] == '!':
-			union(parent, e1, e2)
+			w = int(cmd[3])
+			union(parent, dist, idx1, idx2, w)
 		else:
-			if find(parent, e1) != find(parent, e2):
+			if find(parent, dist, idx1) != find(parent, dist, idx2):
 				RESULT.append('UNKNOWN')
 			else:
-				RESULT.append('k')
+				RESULT.append(dist[idx1] - dist[idx2])
 
-	# print(parent)
-	# print([find(parent, idx) for idx in range(no_samples + 1)])
-print(RESULT)
+for r in RESULT:
+	print(r)
+
