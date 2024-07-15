@@ -289,59 +289,81 @@
 # simulate_aris((1,1,1))
 # print(WARP)
 
+# import sys
+# input = sys.stdin.readline
+# sys.setrecursionlimit(10**6)
+
+# RESULT = []
+
+# def find(parent, dist, idx):
+#     if parent[idx] != idx:
+#         original_parent = parent[idx]
+#         parent[idx] = find(parent, dist, parent[idx])
+#         dist[idx] += dist[original_parent]  # Accumulate distance to the root
+#     return parent[idx]
+
+# def union(parent, dist, rank, idx1, idx2, weight):
+#     root1 = find(parent, dist, idx1)
+#     root2 = find(parent, dist, idx2)
+
+#     if root1 != root2:
+#         if rank[root1] > rank[root2]:
+#             parent[root2] = root1
+#             dist[root2] = dist[idx1] - dist[idx2] + weight
+#         elif rank[root1] < rank[root2]:
+#             parent[root1] = root2
+#             dist[root1] = dist[idx2] + weight - dist[idx1]
+#         else:
+#             parent[root2] = root1
+#             dist[root2] = dist[idx1] - dist[idx2] + weight
+#             rank[root1] += 1
+
+# while True:
+#     no_samples, no_cmds = map(int, input().strip().split())
+#     if no_samples == 0 and no_cmds == 0:
+#         break
+
+#     parent = list(range(no_samples + 1))
+#     dist = [0] * (no_samples + 1)
+#     rank = [0] * (no_samples + 1)
+
+#     for _ in range(no_cmds):
+#         cmd = input().strip().split()
+#         idx1, idx2 = int(cmd[1]), int(cmd[2])
+#         if cmd[0] == '!':
+#             weight = int(cmd[3])
+#             union(parent, dist, rank, idx1, idx2, weight)
+#         else:
+#             if find(parent, dist, idx1) != find(parent, dist, idx2):
+#                 RESULT.append('UNKNOWN')
+#             else:
+#                 RESULT.append(dist[idx1] - dist[idx2])
+
+# for result in RESULT:
+#     print(result)
+
 import sys
 input = sys.stdin.readline
-sys.setrecursionlimit(10**6)
 
-RESULT = []
+VER_PATTERN = int(input().strip())
+LENGTH = int(input().strip())
+STRING = input().strip()
 
-def find(parent, dist, idx):
-    if parent[idx] != idx:
-        original_parent = parent[idx]
-        parent[idx] = find(parent, dist, parent[idx])
-        dist[idx] += dist[original_parent]  # Accumulate distance to the root
-    return parent[idx]
+result = 0
+oi_ctr = 0
+i = 1
 
-def union(parent, dist, rank, idx1, idx2, weight):
-    root1 = find(parent, dist, idx1)
-    root2 = find(parent, dist, idx2)
+while i < LENGTH - 1:
+    if STRING[i - 1] == 'I' and STRING[i] == 'O' and STRING[i + 1] == 'I':
+        oi_ctr += 1
+        if oi_ctr >= VER_PATTERN:
+            result += 1
+        i += 1
+    else:
+        oi_ctr = 0
+    i += 1
 
-    if root1 != root2:
-        if rank[root1] > rank[root2]:
-            parent[root2] = root1
-            dist[root2] = dist[idx1] - dist[idx2] + weight
-        elif rank[root1] < rank[root2]:
-            parent[root1] = root2
-            dist[root1] = dist[idx2] + weight - dist[idx1]
-        else:
-            parent[root2] = root1
-            dist[root2] = dist[idx1] - dist[idx2] + weight
-            rank[root1] += 1
-
-while True:
-    no_samples, no_cmds = map(int, input().strip().split())
-    if no_samples == 0 and no_cmds == 0:
-        break
-
-    parent = list(range(no_samples + 1))
-    dist = [0] * (no_samples + 1)
-    rank = [0] * (no_samples + 1)
-
-    for _ in range(no_cmds):
-        cmd = input().strip().split()
-        idx1, idx2 = int(cmd[1]), int(cmd[2])
-        if cmd[0] == '!':
-            weight = int(cmd[3])
-            union(parent, dist, rank, idx1, idx2, weight)
-        else:
-            if find(parent, dist, idx1) != find(parent, dist, idx2):
-                RESULT.append('UNKNOWN')
-            else:
-                RESULT.append(dist[idx1] - dist[idx2])
-
-for result in RESULT:
-    print(result)
-
+print(result)
 
 
 

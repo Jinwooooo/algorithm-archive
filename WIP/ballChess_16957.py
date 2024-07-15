@@ -27,18 +27,18 @@ def simulate(row, col):
 	drow = [-1,-1,0,1,1,1,0,-1]
 	dcol = [0,1,1,1,0,-1,-1,-1]
 
-	mval, crow, ccol = BOARD[row][col], row, col
+	cmp_row, cmp_col = row, col
 
 	for d in range(8):
 		nrow = row + drow[d]
 		ncol = col + dcol[d]
 
 		if 0 <= nrow < HEIGHT and 0 <= ncol < WIDTH:
-			if mval > BOARD[nrow][ncol]:
-				mval, crow, ccol = BOARD[nrow][ncol], nrow, ncol
+			if BOARD[cmp_row][cmp_col] > BOARD[nrow][ncol]:
+				cmp_row, cmp_col = nrow, ncol
 
-	if mval != BOARD[row][col]:
-		union(coord_to_idx(row, col), coord_to_idx(crow, ccol))
+	if BOARD[cmp_row][cmp_col] != BOARD[row][col]:
+		union(coord_to_idx(row, col), coord_to_idx(cmp_row, cmp_col))
 
 for row in range(HEIGHT):
 	for col in range(WIDTH):
